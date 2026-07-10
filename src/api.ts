@@ -1,0 +1,17 @@
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+import type { AppError, DocumentView, SaveResult } from "./models";
+export const openDocument = (path: string) => invoke<DocumentView>("open_document", { path });
+export const currentDocument = () => invoke<DocumentView | null>("get_current_document");
+export const saveDocument = (path: string) => invoke<SaveResult>("save_current_document", { path });
+export const setFullscreen = (fullscreen: boolean) => invoke<boolean>("set_fullscreen", { fullscreen });
+export const getFullscreen = () => invoke<boolean>("get_fullscreen");
+export const setZoom = (percentage: number) => invoke<number>("set_zoom", { percentage });
+export const onDocumentOpened = (handler: (document: DocumentView) => void) => listen<DocumentView>("document-opened", event => handler(event.payload));
+export const onDocumentError = (handler: (error: AppError) => void) => listen<AppError>("document-error", event => handler(event.payload));
+export const onMenuOpenDocument = (handler: () => void) => listen("menu-open-document", handler);
+export const onMenuSaveAsHtml = (handler: () => void) => listen("menu-save-as-html", handler);
+export const onMenuZoomIn = (handler: () => void) => listen("menu-zoom-in", handler);
+export const onMenuZoomOut = (handler: () => void) => listen("menu-zoom-out", handler);
+export const onMenuZoomReset = (handler: () => void) => listen("menu-zoom-reset", handler);
+export const onFullscreenChanged = (handler: (fullscreen: boolean) => void) => listen<boolean>("fullscreen-changed", event => handler(event.payload));

@@ -1,0 +1,21 @@
+[package]
+name = "yamlmdviewer"
+version = "0.1.0"
+description = "Secure YAML Markdown HTML viewer"
+edition = "2024"
+
+[lib]
+name = "yamlmdviewer_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+mdyaml2html = { git = "https://github.com/luisoncpp/html-effectiveness-scripts", rev = "6705b94d7b74d4279841c75c3eb03b0df2df8b1d" }
+
