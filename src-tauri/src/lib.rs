@@ -5,6 +5,7 @@ mod error;
 mod instance;
 mod menu;
 mod models;
+mod preview;
 
 use crate::{
     arguments::parse_document_argument,
@@ -19,6 +20,9 @@ use std::{path::PathBuf, sync::Mutex};
 
 pub fn run() {
     tauri::Builder::default()
+        .register_uri_scheme_protocol("yamlmdpreview", |context, request| {
+            preview::respond(context.app_handle(), request.uri().path())
+        })
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
             handle_secondary_instance(app.clone(), argv, cwd)
         }))

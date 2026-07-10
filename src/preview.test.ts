@@ -1,27 +1,31 @@
-import { describe, expect, it } from "vitest";
-import { clearPreview, previewKeyMessage, previewZoomMessage, showPreview } from "./preview";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { clearPreview, showPreview } from "./preview";
 
 describe("preview shell", () => {
-  it("injects the keyboard bridge without changing the exported HTML", () => {
-    const frame = { srcdoc: "" } as HTMLIFrameElement;
-    const compiled = "<!doctype html><html><head><title>Example</title></head><body>Body</body></html>";
+  afterEach(() => vi.unstubAllGlobals());
 
-    showPreview(frame, compiled);
+  it("loads a revision from the isolated preview protocol", () => {
+    const frame = { src: "" } as HTMLIFrameElement;
 
-    expect(frame.srcdoc).toContain(previewKeyMessage);
-    expect(frame.srcdoc).toContain('event.key==="F11"');
-    expect(frame.srcdoc).toContain('event.key==="Escape"');
-    expect(frame.srcdoc).toContain(previewZoomMessage);
-    expect(frame.srcdoc).toContain('event.ctrlKey');
-    expect(frame.srcdoc).toContain('addEventListener("wheel"');
-    expect(compiled).not.toContain(previewKeyMessage);
+    showPreview(frame, 42);
+
+    expect(frame.src).toBe("yamlmdpreview://localhost/42/light");
+  });
+
+  it("requests dark mode before loading when the system prefers it", () => {
+    vi.stubGlobal("matchMedia", vi.fn().mockReturnValue({ matches: true }));
+    const frame = { src: "" } as HTMLIFrameElement;
+
+    showPreview(frame, 42);
+
+    expect(frame.src).toBe("yamlmdpreview://localhost/42/dark");
   });
 
   it("keeps keyboard handling available before a document is open", () => {
-    const frame = { srcdoc: "" } as HTMLIFrameElement;
+    const frame = { src: "" } as HTMLIFrameElement;
 
     clearPreview(frame);
 
-    expect(frame.srcdoc).toContain(previewKeyMessage);
+    expect(frame.src).toBe("yamlmdpreview://localhost/empty/light");
   });
 });

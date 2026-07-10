@@ -37,7 +37,7 @@ function showDocument(document: DocumentView): void {
   title.textContent = document.displayTitle;
   pathText.textContent = document.sourcePath;
   pathText.title = document.sourcePath;
-  showPreview(preview, document.compiledHtml);
+  showPreview(preview, document.revision);
   setStatus("Document loaded.");
 }
 

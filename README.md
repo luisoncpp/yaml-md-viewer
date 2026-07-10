@@ -44,7 +44,9 @@ CLI usage: `yamlmdviewer [--] [DOCUMENT.yaml.md]`.
 
 Use the native **File** menu to open a document or save HTML. Use **View → Fullscreen** or `F11` to enter fullscreen; `F11` or `Esc` exits it. Fullscreen hides both the menu bar and the bottom status bar.
 
-The preview uses `iframe.srcdoc` with an opaque `sandbox="allow-scripts"` origin and a preview-only restrictive CSP. Compiler component scripts may run; source-authored scripts are disabled at compilation. The exported HTML is never modified by preview security wrapping.
+Documents and the viewer shell open in dark mode immediately when the operating system prefers a dark color scheme.
+
+The preview uses a narrow local protocol inside an opaque `sandbox="allow-scripts"` iframe and has its own restrictive response CSP. Compiler component scripts may run; source-authored scripts are disabled at compilation. The exported HTML is never modified by preview security wrapping.
 
 No installer should be distributed until the upstream compiler project provides or confirms its license.
 
