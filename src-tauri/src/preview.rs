@@ -3,7 +3,7 @@ use std::sync::Mutex;
 use tauri::{AppHandle, Manager, Runtime, http};
 
 const POLICY: &str = "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; media-src 'none'";
-const BRIDGE: &str = r#"<script>addEventListener("keydown",event=>{if(event.key==="F11"||event.key==="Escape"){event.preventDefault();parent.postMessage({type:"yamlmdviewer-preview-key",key:event.key},"*");return}if(event.ctrlKey&&!event.altKey&&["+","=","-","0"].includes(event.key)){event.preventDefault();parent.postMessage({type:"yamlmdviewer-preview-zoom",key:event.key},"*")}});addEventListener("wheel",event=>{if(event.ctrlKey){event.preventDefault();parent.postMessage({type:"yamlmdviewer-preview-zoom",deltaY:event.deltaY},"*")}},{passive:false})</script>"#;
+const BRIDGE: &str = r#"<script>addEventListener("keydown",event=>{if(event.key==="F11"||event.key==="Escape"){event.preventDefault();parent.postMessage({type:"yamlmdviewer-preview-key",key:event.key},"*");return}if(event.ctrlKey&&!event.altKey&&["+","=","-","0"].includes(event.key)){event.preventDefault();parent.postMessage({type:"yamlmdviewer-preview-zoom",key:event.key},"*")}});addEventListener("wheel",event=>{if(event.ctrlKey){event.preventDefault();parent.postMessage({type:"yamlmdviewer-preview-zoom",deltaY:event.deltaY},"*")}},{passive:false});addEventListener("message",event=>{if(event.source===parent&&event.data?.type==="yamlmdviewer-preview-apply-zoom"&&Number.isFinite(event.data.percentage)){document.documentElement.style.zoom=event.data.percentage/100}})</script>"#;
 
 pub fn respond<R: Runtime>(app: &AppHandle<R>, path: &str) -> http::Response<Vec<u8>> {
     let mut path_parts = path.trim_matches('/').split('/');
@@ -111,6 +111,12 @@ mod tests {
         let secured = secured_html(compiled, true);
 
         assert!(secured.contains("<html lang=\"en\" data-theme=\"dark\">"));
+    }
+
+    #[test]
+    fn bridge_applies_zoom_inside_the_preview_document() {
+        assert!(BRIDGE.contains("document.documentElement.style.zoom"));
+        assert!(BRIDGE.contains("event.source===parent"));
     }
 
     #[test]

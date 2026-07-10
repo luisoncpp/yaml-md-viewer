@@ -1,5 +1,6 @@
 export const previewKeyMessage = "yamlmdviewer-preview-key";
 export const previewZoomMessage = "yamlmdviewer-preview-zoom";
+export const previewApplyZoomMessage = "yamlmdviewer-preview-apply-zoom";
 
 function previewUrl(revision?: number): string {
   const path = revision === undefined ? "empty" : String(revision);

@@ -96,11 +96,8 @@ pub fn get_fullscreen(window: WebviewWindow) -> Result<bool, AppError> {
 }
 
 #[tauri::command]
-pub fn set_zoom(window: WebviewWindow, percentage: i32) -> Result<i32, AppError> {
+pub fn set_zoom(app: AppHandle, percentage: i32) -> Result<i32, AppError> {
     let percentage = percentage.clamp(25, 500);
-    window
-        .set_zoom(f64::from(percentage) / 100.0)
-        .map_err(|_| AppError::new("write_failed", "Zoom could not be changed."))?;
-    crate::menu::sync_zoom_item(window.app_handle(), percentage);
+    crate::menu::sync_zoom_item(&app, percentage);
     Ok(percentage)
 }

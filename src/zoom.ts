@@ -4,7 +4,7 @@ import {
   onMenuZoomReset,
   setZoom,
 } from "./api";
-import { previewZoomMessage } from "./preview";
+import { previewApplyZoomMessage, previewZoomMessage } from "./preview";
 
 export const zoomLevels = [25, 33, 50, 67, 75, 80, 90, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500] as const;
 
@@ -17,8 +17,15 @@ export function setupZoom(preview: HTMLIFrameElement): void {
   let percentage = 100;
   let pending = Promise.resolve();
 
+  const applyToPreview = () => {
+    preview.contentWindow?.postMessage({
+      type: previewApplyZoomMessage,
+      percentage,
+    }, "*");
+  };
   const apply = (next: number) => {
     percentage = next;
+    applyToPreview();
     pending = pending.then(() => setZoom(next)).then(() => undefined).catch(() => undefined);
   };
   const step = (direction: -1 | 1) => apply(nextZoom(percentage, direction));
@@ -46,6 +53,7 @@ export function setupZoom(preview: HTMLIFrameElement): void {
       handleKey(event.data.key, true, false, () => undefined);
     }
   });
+  preview.addEventListener("load", applyToPreview);
 
   void Promise.all([
     onMenuZoomIn(() => step(1)),
